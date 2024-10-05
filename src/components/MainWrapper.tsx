@@ -2,31 +2,87 @@ import styled from "@emotion/styled";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { useState , useEffect} from "react";
+import { CityElement } from "./CityElement";
 
 export const MainWrapper = () => {
-    const [data, setData] = useState({});
+    const [searchData, setSearchData] = useState<any>({});
+    const [localizationData, setLocalizationData] = useState<any>({});
     const [inputValue, setInputValue] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    if(inputValue != '') {
-        axios.get(process.env.REACT_APP_WEATHER_API_URL + '/current.json', {
-            params: {
-                key:process.env.REACT_APP_WEATHER_API_KEY,
-                q:'Paris'
-            }
-        }).then((data:any) => {
-            setData(data.data)
-        });
-    }
+        
+    useEffect(() => {
+        if(inputValue != '') {
+            axios.get(process.env.REACT_APP_WEATHER_API_URL + '/search.json', {
+                params: {
+                    key:process.env.REACT_APP_WEATHER_API_KEY,
+                    q:inputValue
+                }
+            }).then((data:any) => {
+                setSearchData(data.data)
+                //console.log(searchData)
+            });
+        }
+    },[inputValue])
     
+    const onLoseFocusHandler = () => {
+        if(searchData[0]) {
+            let isEqual = false;
+            searchData.forEach((element: any) => {
+                if(element.name.toLowerCase() == inputValue.toLowerCase()) {
+                    isEqual = true
+                    setInputValue(element.name)
+                    return
+                } 
+            });
+            if(!isEqual) {
+                setInputValue(searchData[0].name)
+            }
+            
+        } else {
+            setInputValue('')
+        }
+        
+    }
+
+    useEffect(() => {
+        if(searchData[0]) {
+            let tempDataStorage:any = [];
+            searchData.forEach((element: any) => {
+                
+                axios.get(process.env.REACT_APP_WEATHER_API_URL + '/current.json', {
+                    params: {
+                        key:process.env.REACT_APP_WEATHER_API_KEY,
+                        q:element.name
+                    }
+                }).then((data:any) => {
+                    tempDataStorage.push(data.data)
+                    setLocalizationData(tempDataStorage);
+                });
+            });
+        }
+    },[searchData]);
+
+    console.log(searchData)
+    console.log(localizationData[0])
+
+
     return(
         <StyledMainWrapper>
             <Header>Check Your Wheather Now!!!</Header>
-            <>
-                <input type="text" onChange={(e: any) => setInputValue(e.target.value)}/>
-                <input type="button" defaultValue={'Search'}/>
-            </>
+            <SearchContainer>
+                <input type="text" placeholder="Search..." value={inputValue} onBlur={() => onLoseFocusHandler()} onChange={(e: any) => setInputValue(e.target.value)}/>
+            </SearchContainer>
+            {
+            localizationData[0] ? localizationData.map((e:any, index:any) => {
+                return <CityElement />
+            })
+            : <></>
+            }
         </StyledMainWrapper>
     );
+    
+
 };
 
 
@@ -42,5 +98,17 @@ const Header = styled.h1`
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    margin-left: 50px;
+`;
+
+const SearchContainer = styled.div`
+    height: 10%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid black;
+
+    input:first-of-type {
+        margin-left: 50px;
+    }
 `;
