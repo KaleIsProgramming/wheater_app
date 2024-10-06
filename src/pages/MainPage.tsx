@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import {  motion } from "framer-motion";
 import { MainWrapper } from "../components";
 
 export const MainPage = () => {

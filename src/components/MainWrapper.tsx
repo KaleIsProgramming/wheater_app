@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
 import axios from "axios";
-import { motion } from "framer-motion";
 import { useState , useEffect} from "react";
 import { CityElement } from "./CityElement";
 
@@ -8,9 +7,7 @@ export const MainWrapper = () => {
     const [searchData, setSearchData] = useState<any>({});
     const [localizationData, setLocalizationData] = useState<any>({});
     const [inputValue, setInputValue] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-
-        
+    
     useEffect(() => {
         if(inputValue != '') {
             axios.get(process.env.REACT_APP_WEATHER_API_URL + '/search.json', {
@@ -20,7 +17,6 @@ export const MainWrapper = () => {
                 }
             }).then((data:any) => {
                 setSearchData(data.data)
-                //console.log(searchData)
             });
         }
     },[inputValue])
@@ -61,7 +57,6 @@ export const MainWrapper = () => {
                 }
                 if(!isCopy) {
                     filtredSearchData.push(searchData[i])
-                    console.log(filtredSearchData)
                 }
             }
             filtredSearchData.forEach((element: any) => {
@@ -79,8 +74,6 @@ export const MainWrapper = () => {
         }
     },[searchData]);
 
-    console.log(searchData)
-    console.log(localizationData[0])
 
 
     return(

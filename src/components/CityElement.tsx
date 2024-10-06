@@ -1,6 +1,5 @@
 import { FC } from "react";
 import styled from "@emotion/styled";
-import { motion } from "framer-motion";
 
 export const CityElement:FC<any> = ({data}) => {
     
