@@ -48,7 +48,23 @@ export const MainWrapper = () => {
     useEffect(() => {
         if(searchData[0]) {
             let tempDataStorage:any = [];
-            searchData.forEach((element: any) => {
+            let filtredSearchData:any = [];
+            for(let i = 0; i < searchData.length-1; i++) {
+                let isCopy = false;
+                for(let j = 0; j < searchData.length-1; j++) {
+                    if(j == 0) {
+                        isCopy = false;
+                    }
+                    if(searchData[i].name == searchData[j].name && i != j){
+                        isCopy = true;
+                    } 
+                }
+                if(!isCopy) {
+                    filtredSearchData.push(searchData[i])
+                    console.log(filtredSearchData)
+                }
+            }
+            filtredSearchData.forEach((element: any) => {
                 
                 axios.get(process.env.REACT_APP_WEATHER_API_URL + '/current.json', {
                     params: {
@@ -73,12 +89,14 @@ export const MainWrapper = () => {
             <SearchContainer>
                 <input type="text" placeholder="Search..." value={inputValue} onBlur={() => onLoseFocusHandler()} onChange={(e: any) => setInputValue(e.target.value)}/>
             </SearchContainer>
-            {
-            localizationData[0] ? localizationData.map((e:any, index:any) => {
-                return <CityElement />
-            })
-            : <></>
-            }
+            <LocationsList>
+                {
+                localizationData[0] ? localizationData.map((data:any, index:any) => {
+                    return <CityElement data={data}/>
+                })
+                : <></>
+                }
+            </LocationsList>
         </StyledMainWrapper>
     );
     
@@ -91,6 +109,12 @@ const StyledMainWrapper = styled.div`
     width: 50%;
     border-radius: 20px;
     background: white;
+
+    @media screen and (max-width: 880px){
+        width: 100%;
+        height: 100%;
+        border-radius: 0px;
+    }
 `;
 
 const Header = styled.h1`
@@ -111,4 +135,11 @@ const SearchContainer = styled.div`
     input:first-of-type {
         margin-left: 50px;
     }
+`;
+
+const LocationsList = styled.div`
+    height: 70%;
+    width: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
 `;
